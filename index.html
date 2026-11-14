@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Meridian — thoughtfully selected everyday products.">
+  <title>Meridian | Modern Store</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+
+  <header class="header">
+    <a class="logo" href="#home">meridian<span>.</span></a>
+    <nav id="nav">
+      <a href="#home">Home</a>
+      <a href="#shop">Shop</a>
+      <a href="#orders">My Orders</a>
+    </nav>
+    <div class="actions">
+      <button id="searchBtn" aria-label="Search">⌕</button>
+      <a href="#cart">Bag <b id="cartCount">0</b></a>
+      <a href="#account">Account</a>
+      <button id="menuBtn" aria-label="Menu">☰</button>
+    </div>
+  </header>
+
+  <main>
+
+    <section class="page" id="home">
+      <div class="hero">
+        <div>
+          <small>THE NEW COLLECTION</small>
+          <h1>Find your<br>everyday essentials.</h1>
+          <p>Thoughtfully selected products for a better everyday experience.</p>
+          <a class="btn" href="#shop">Explore collection →</a>
+        </div>
+        <div class="hero-art">
+          <div class="orb"></div>
+          <span>SIMPLICITY<br>MEETS QUALITY</span>
+        </div>
+      </div>
+
+      <section class="section">
+        <div class="section-head">
+          <div>
+            <small>CURATED FOR YOU</small>
+            <h2>Featured products</h2>
+          </div>
+          <a href="#shop">View all →</a>
+        </div>
+        <div class="products" id="featured"></div>
+      </section>
+
+      <section class="promo">
+        <div>
+          <small>A BETTER WAY TO SHOP</small>
+          <h2>Quality over quantity.</h2>
+          <p>Discover products selected with care.</p>
+        </div>
+        <a class="btn light" href="#shop">Shop now →</a>
+      </section>
+    </section>
+
+    <section class="page hidden" id="shop">
+      <div class="heading">
+        <small>OUR COLLECTION</small>
+        <h1>Shop everything.</h1>
+        <p>Explore our collection and find something you love.</p>
+      </div>
+      <div class="filters">
+        <input id="search" type="search" placeholder="Search products...">
+        <select id="category">
+          <option value="all">All categories</option>
+        </select>
+        <select id="sort">
+          <option value="default">Featured</option>
+          <option value="low">Price: low to high</option>
+          <option value="high">Price: high to low</option>
+          <option value="name">Name: A–Z</option>
+        </select>
+      </div>
+      <div class="products shop-products" id="listing"></div>
+    </section>
+
+    <section class="page hidden" id="product">
+      <div id="productView"></div>
+    </section>
+
+    <section class="page hidden" id="cart">
+      <div class="heading">
+        <small>YOUR SELECTION</small>
+        <h1>Shopping bag.</h1>
+      </div>
+      <div id="cartView"></div>
+    </section>
+
+    <section class="page hidden" id="checkout">
+      <div class="heading">
+        <small>ALMOST THERE</small>
+        <h1>Checkout.</h1>
+      </div>
+      <form class="form" id="checkoutForm">
+        <h2>Delivery information</h2>
+        <label>
+          Full name
+          <input name="name" required>
+        </label>
+        <label>
+          Email address
+          <input name="email" type="email" required>
+        </label>
+        <label>
+          Phone number
+          <input name="phone" required>
+        </label>
+        <label>
+          Delivery address
+          <textarea name="address" required></textarea>
+        </label>
+        <label>
+          Payment method
+          <select name="paymentMethod">
+            <option value="cash">Cash on delivery</option>
+            <option value="bank">Bank transfer</option>
+          </select>
+        </label>
+        <div id="checkoutTotal"></div>
+        <button class="btn wide">Place order</button>
+      </form>
+    </section>
+
+    <section class="page hidden" id="account">
+      <div class="heading">
+        <small>YOUR ACCOUNT</small>
+        <h1>Welcome back.</h1>
+      </div>
+      <div class="auth">
+        <form class="form" id="login">
+          <h2>Sign in</h2>
+          <label>
+            Email
+            <input name="email" type="email" required>
+          </label>
+          <label>
+            Password
+            <input name="password" type="password" required>
+          </label>
+          <button class="btn wide">Sign in</button>
+        </form>
+
+        <form class="form" id="register">
+          <h2>Create account</h2>
+          <label>
+            Full name
+            <input name="name" required>
+          </label>
+          <label>
+            Email
+            <input name="email" type="email" required>
+          </label>
+          <label>
+            Password
+            <input name="password" type="password" minlength="6" required>
+          </label>
+          <button class="btn wide">Create account</button>
+        </form>
+      </div>
+      <div id="accountStatus"></div>
+    </section>
+
+    <section class="page hidden" id="orders">
+      <div class="heading">
+        <small>ORDER HISTORY</small>
+        <h1>Your orders.</h1>
+      </div>
+      <div id="orderList"></div>
+    </section>
+
+    <section class="page hidden" id="admin">
+      <div class="heading">
+        <small>STORE MANAGEMENT</small>
+        <h1>Admin dashboard.</h1>
+        <p>Manage inventory and customer orders.</p>
+      </div>
+
+      <div class="stats" id="stats"></div>
+
+      <form class="form" id="productForm">
+        <h2 id="formTitle">Add a product</h2>
+        <input type="hidden" name="id">
+        <label>
+          Product name
+          <input name="name" required>
+        </label>
+        <label>
+          Price (ETB)
+          <input name="price" type="number" min="0" step=".01" required>
+        </label>
+        <label>
+          Category
+          <input name="category" required>
+        </label>
+        <label>
+          Description
+          <textarea name="description" required></textarea>
+        </label>
+        <label>
+          Image URL
+          <input name="image" type="url" placeholder="https://...">
+        </label>
+        <label>
+          Upload image
+          <input name="imageFile" type="file" accept="image/*">
+        </label>
+        <label>
+          Stock quantity
+          <input name="stock" type="number" min="0" value="10" required>
+        </label>
+        <button class="btn wide">Save product</button>
+        <button type="button" class="link hidden" id="cancelEdit">Cancel editing</button>
+      </form>
+
+      <h2 class="subhead">Products</h2>
+      <div id="adminProducts"></div>
+
+      <h2 class="subhead">Recent orders</h2>
+      <div id="adminOrders"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <a class="logo" href="#home">meridian<span>.</span></a>
+    <p>Thoughtful shopping. Better everyday living.</p>
+    <small>© <span id="year"></span> Meridian. All rights reserved.</small>
+    <p><a href="#admin">Store management</a></p>
+  </footer>
+
+  <div id="toast" role="status"></div>
+
+</body>
+</html>
