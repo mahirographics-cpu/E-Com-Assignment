@@ -424,32 +424,33 @@ function renderAdmin() {
 }
 
 async function api(path, opt = {}) {
-    let h = {
-        ...(opt.headers || {})
-    };
+    const headers = { ...(opt.headers || {}) };
 
     if (token) {
-        h.Authorization = "Bearer " + token;
+        headers.Authorization = "Bearer " + token;
     }
 
+    // JSON bodies are sent as JSON; FormData (image upload) is sent as multipart automatically
     if (opt.body && !(opt.body instanceof FormData)) {
-        h["Content-Type"] = "application/json";
+        headers["Content-Type"] = "application/json";
     }
 
-    let r = await fetch(API_BASE + path, {
-        ...opt,
-        headers: h
-    });
+    try {
+        const res = await axios({
+            url: API_BASE + path,
+            method: opt.method || "GET",
+            headers,
+            data: opt.body
+        });
 
-    let d = await r.json().catch(() => ({
-        message: "Server response error"
-    }));
-
-    if (!r.ok) {
-        throw Error(d.message || "Request failed");
+        return res.data;
+    } catch (err) {
+        throw Error(
+            (err.response && err.response.data && err.response.data.message) ||
+            err.message ||
+            "Request failed"
+        );
     }
-
-    return d;
 }
 
 async function load() {
