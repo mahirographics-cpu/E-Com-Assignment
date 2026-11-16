@@ -1,5 +1,5 @@
 
-const API_BASE = "https://e-com-assignment-8ozl.onrender.com";
+const API_BASE = "https://e-com-assignment-8ozl.onrender.com/api";
 
 const DEMO = [
     {
