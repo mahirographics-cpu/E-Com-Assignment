@@ -178,11 +178,37 @@
       <div id="orderList"></div>
     </section>
 
+    <section class="page hidden" id="admin-login">
+      <div class="heading">
+        <small>STAFF ONLY</small>
+        <h1>Store sign in.</h1>
+        <p>Sign in with an administrator account to manage the store.</p>
+      </div>
+      <form class="form" id="adminLogin">
+        <h2>Administrator sign in</h2>
+        <label>
+          Email
+          <input name="email" type="email" autocomplete="username" required>
+        </label>
+        <label>
+          Password
+          <input name="password" type="password" autocomplete="current-password" required>
+        </label>
+        <button class="btn wide">Sign in</button>
+        <p class="form-error" id="adminLoginError" role="alert"></p>
+      </form>
+    </section>
+
+    <section class="page hidden" id="admin-check">
+      <div class="empty">Checking your session…</div>
+    </section>
+
     <section class="page hidden" id="admin">
       <div class="heading">
         <small>STORE MANAGEMENT</small>
         <h1>Admin dashboard.</h1>
         <p>Manage inventory and customer orders.</p>
+        <button type="button" class="small" id="adminLogout">Sign out</button>
       </div>
 
       <div class="stats" id="stats"></div>

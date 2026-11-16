@@ -1,5 +1,5 @@
 
-const API_BASE = "https://e-com-assignment-xxxx.onrender.com/api";
+const API_BASE = "https://e-com-assignment-8ozl.onrender.com";
 
 const DEMO = [
     {
@@ -153,20 +153,79 @@ function renderProducts() {
     renderShop();
 }
 
-function page() {
-    let id = location.hash.slice(1).split("?")[0] || "home";
+const isAdmin = () => !!(token && user && user.role === "admin");
 
+function show(id) {
     document.querySelectorAll(".page").forEach(x =>
         x.classList.toggle("hidden", x.id !== id)
     );
+}
+
+function saveSession() {
+    localStorage.setItem("meridian_token", token);
+    localStorage.setItem("meridian_user", JSON.stringify(user));
+}
+
+function endSession(msg) {
+    token = "";
+    user = null;
+    localStorage.removeItem("meridian_token");
+    localStorage.removeItem("meridian_user");
+    accountStatus();
+    if (msg) toast(msg);
+}
+
+// Ask the server who we really are; never trust the role saved in the browser.
+async function verifyAdmin() {
+    try {
+        let d = await api("/auth/me");
+        user = d.user;
+        saveSession();
+        return user.role === "admin";
+    } catch (e) {
+        if (e.status !== 401) toast("Could not reach the server. Try again.");
+        return false;
+    }
+}
+
+let pageSeq = 0;
+
+function page() {
+    let id = location.hash.slice(1).split("?")[0] || "home";
+    let seq = ++pageSeq;
 
     $("#nav").classList.remove("open");
+
+    // Store management needs a signed-in admin, confirmed by the server.
+    if (id === "admin") {
+        if (!isAdmin()) {
+            location.hash = "#admin-login";
+            return;
+        }
+
+        show("admin-check");
+
+        verifyAdmin().then(ok => {
+            if (seq !== pageSeq) return;
+
+            if (ok) {
+                show("admin");
+                renderAdmin();
+                window.scrollTo(0, 0);
+            } else {
+                location.hash = "#admin-login";
+            }
+        });
+
+        return;
+    }
+
+    show(id);
 
     if (id === "product") renderProduct();
     if (id === "cart") renderCart();
     if (id === "checkout") renderTotal();
     if (id === "orders") renderOrders();
-    if (id === "admin") renderAdmin();
     if (id === "account") accountStatus();
 
     window.scrollTo(0, 0);
@@ -334,6 +393,8 @@ function accountStatus() {
                 </button>
             </p>
         `;
+    } else {
+        $("#accountStatus").innerHTML = "";
     }
 }
 
@@ -445,11 +506,26 @@ async function api(path, opt = {}) {
 
         return res.data;
     } catch (err) {
-        throw Error(
+        let status = err.response && err.response.status;
+
+        // Saved session is no longer valid (expired token, deleted account...)
+        if (status === 401 && token && !path.startsWith("/auth/login")) {
+            endSession("Your session expired. Please sign in again.");
+
+            if (location.hash.startsWith("#admin")) {
+                location.hash = "#admin-login";
+            }
+        }
+
+        let e = Error(
             (err.response && err.response.data && err.response.data.message) ||
             err.message ||
             "Request failed"
         );
+
+        e.status = status;
+
+        throw e;
     }
 }
 
@@ -609,18 +685,12 @@ document.addEventListener("click", e => {
         toast("Product removed in this preview.");
     }
 
-    if (e.target.id === "logout") {
-        token = "";
+    if (e.target.id === "logout" || e.target.id === "adminLogout") {
+        endSession("Signed out.");
 
-        user = null;
-
-        localStorage.removeItem("meridian_token");
-
-        localStorage.removeItem("meridian_user");
-
-        accountStatus();
-
-        toast("Signed out.");
+        if (location.hash.startsWith("#admin")) {
+            location.hash = "#home";
+        }
     }
 
 });
@@ -629,6 +699,42 @@ $("#login").onsubmit = e => {
     e.preventDefault();
 
     auth(e.currentTarget, "login");
+};
+
+$("#adminLogin").onsubmit = async e => {
+    e.preventDefault();
+
+    let f = e.currentTarget;
+    let err = $("#adminLoginError");
+    let btn = f.querySelector("button");
+
+    err.textContent = "";
+    btn.disabled = true;
+
+    try {
+        let d = await api("/auth/login", {
+            method: "POST",
+            body: JSON.stringify(Object.fromEntries(new FormData(f)))
+        });
+
+        if (!d.user || d.user.role !== "admin") {
+            err.textContent = "This account is not authorized to manage the store.";
+            return;
+        }
+
+        token = d.token;
+        user = d.user;
+        saveSession();
+
+        f.reset();
+        accountStatus();
+        location.hash = "#admin";
+
+    } catch (ex) {
+        err.textContent = ex.message;
+    } finally {
+        btn.disabled = false;
+    }
 };
 
 $("#register").onsubmit = e => {
@@ -762,6 +868,11 @@ $("#productForm").onsubmit = async e => {
         toast("Product saved to backend.");
 
     } catch (err) {
+        if (err.status === 401 || err.status === 403) {
+            if (err.status === 403) toast(err.message);
+            return;
+        }
+
         p._id = id || "local-" + Date.now();
 
         products = id
