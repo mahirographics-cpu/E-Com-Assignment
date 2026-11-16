@@ -1,5 +1,5 @@
 
-const API_BASE = "http://localhost:5000/api";
+const API_BASE = "https://e-com-assignment-xxxx.onrender.com/api";
 
 const DEMO = [
     {
